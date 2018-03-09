@@ -4,9 +4,15 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
 
-COUNTRIES = (('italy', 'Italy'),
-			 ('france', 'France'),
-			 ('germany', 'Germany')
+COUNTRIES = (('Italy', 'Italy'),
+			 ('France', 'France'),
+			 ('Germany', 'Germany')
+			)
+
+REASONS = (('health', 'Health'),
+			 ('lost_job', 'Lost Job'),
+			 ('migration_issues', 'Migration Issues'),
+			 ('other', 'Other')
 			)
 
 class Account(models.Model):
@@ -21,6 +27,7 @@ class Account(models.Model):
 	age = models.IntegerField()
 	country = models.CharField(max_length=256, choices=COUNTRIES)
 	profile_photo = models.FileField(null=True, upload_to="profile_photos/")
+	credit_score = models.IntegerField(blank=True, null=True)
 
 
 class Employment(models.Model):
@@ -31,17 +38,17 @@ class Employment(models.Model):
 	start_date = models.DateField()
 	end_date = models.DateField(blank=True, null=True)
 	currently_employed = models.BooleanField(default=False, verbose_name="Currently Employed")
-	wage = models.DecimalField(decimal_places=2, max_digits=6, verbose_name="Hourly Wage")
+	monthly_salary = models.DecimalField(decimal_places=2, max_digits=6, verbose_name="Monthly Salary")
 
 
 class Identification(models.Model):
-	account = models.ForeignKey(Account)
+	account = models.OneToOneField(Account)
 	name = models.CharField(max_length=100)
 	file = models.FileField(upload_to='id_documents/')
 
 
 class FinancialInfo(models.Model):
-	account = models.ForeignKey(Account)
+	account = models.OneToOneField(Account)
 
 	monthly_income = models.DecimalField(decimal_places=2, max_digits=12, default=0)
 	housing_expense = models.DecimalField(decimal_places=2, max_digits=12, default=0)
@@ -50,15 +57,18 @@ class FinancialInfo(models.Model):
 	
 	has_bank_account = models.BooleanField(default=False)
 	amount_in_bank = models.DecimalField(decimal_places=2, max_digits=12, default=0)
-
-	has_cash = models.BooleanField(default=False)
 	amount_cash = models.DecimalField(decimal_places=2, max_digits=12,blank=True, null=True)
 
 	has_debts = models.BooleanField(default=False)
 	amount_debts = models.DecimalField(decimal_places=2, max_digits=12, blank=True, null=True)
+	num_months_debt = models.IntegerField(blank=True, null=True)
+	ongoing_debt = models.BooleanField(default=False)
+	reason_ongoing = models.CharField(max_length=256, choices=REASONS)
 
 	# What more needs to go here?
 	missed_payments = models.IntegerField(blank=True, null=True)
+
+	loan_file = models.FileField(upload_to="loan_docs/", blank=True, null=True)
 
 
 

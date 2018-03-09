@@ -34,7 +34,7 @@ class EmploymentForm(forms.ModelForm):
 
 	class Meta:
 		model = Employment
-		fields = ('employer', 'phone', 'wage', 'start_date', 'end_date', 'currently_employed', 'paystub')
+		fields = ('employer', 'phone', 'monthly_salary', 'start_date', 'end_date', 'currently_employed', 'paystub')
 		widgets = {'start_date': DateTypeInput,
 				   'end_date': DateTypeInput}
 
@@ -50,4 +50,6 @@ class FinancialInfoForm(forms.ModelForm):
 
 	class Meta:
 		model = FinancialInfo
-		fields = ('monthly_income', 'housing_expense', 'time_in_europe', 'has_bank_account', 'amount_in_bank', 'has_cash', 'amount_cash', 'has_debts', 'amount_debts', 'missed_payments')
+		fields = ('monthly_income', 'housing_expense', 'time_in_europe', 'has_bank_account', 'num_months_debt',
+				  'amount_in_bank', 'amount_cash', 'has_debts', 'amount_debts', 
+				  'num_months_debt', 'ongoing_debt', 'reason_ongoing', 'missed_payments', 'loan_file')
