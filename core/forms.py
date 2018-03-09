@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 
 from core.models import *
 
+
 class DateTypeInput(forms.DateInput):
     # used as a way to allow a date input type
     input_type = 'date'
@@ -26,7 +27,7 @@ class AccountForm(forms.ModelForm):
 
 	class Meta:
 		model = Account
-		fields = ('name', 'phone', 'address', 'city', 'gender', 'age')
+		fields = ('name', 'phone', 'address', 'city', 'gender', 'age', 'profile_photo')
 
 
 class EmploymentForm(forms.ModelForm):
@@ -36,3 +37,17 @@ class EmploymentForm(forms.ModelForm):
 		fields = ('employer', 'phone', 'wage', 'start_date', 'end_date', 'currently_employed')
 		widgets = {'start_date': DateTypeInput,
 				   'end_date': DateTypeInput}
+
+
+class IdentificationForm(forms.ModelForm):
+    
+    class Meta:
+    	model = Identification
+    	fields = ('name', 'file')
+
+
+class FinancialInfoForm(forms.ModelForm):
+
+	class Meta:
+		model = FinancialInfo
+		fields = ('has_bank_account',)

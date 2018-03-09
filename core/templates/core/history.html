@@ -31,11 +31,29 @@
   <br>
 
 	<!-- Button trigger modal -->
-	<button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#myModal">
+	<button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#employmentModal">
 	  Add previous employment
 	</button>
 
   <hr>
+  
+  <img style="width:50%" src="guvhacks{{ user.account.identification_set.all.0.file.url }}">
+
+  <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#idModal">
+    Upload Identification Document
+  </button>
+
+  <hr>
+
+  <p>How much do you currently pay for housing?</p>
+
+  <p>How long have you been in Europe?</p>
+
+  <p>Do you have a bank account?</p>
+  <p>If so, what is the balance?</p>
+
+  <p>Any outstanding debts?</p>
+  <p>If so, how much?</p>
 
   <p>  Employment history for the past 2 years including wage per hour or salary per month. Gap between two jobs if any. 
 
@@ -62,11 +80,11 @@ Have you ever missed a payment such as debt, credit card and rent in the past 2 
 
 
 <!-- Employment Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="employmentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Add Employment History</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -82,6 +100,31 @@ Have you ever missed a payment such as debt, credit card and rent in the past 2 
 	        <button type="submit" class="btn btn-primary">Add</button>
 	      </div>
   	  </form>
+    </div>
+  </div>
+</div>
+
+<!-- Photo Modal -->
+<div class="modal fade" id="idModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Identification Document</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="post" enctype="multipart/form-data">
+        <div class="modal-body">
+            {% csrf_token %}
+            {{ file_form.as_p }}
+            <input type="hidden" name="action" value="add_id">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

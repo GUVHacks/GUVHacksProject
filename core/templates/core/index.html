@@ -2,18 +2,25 @@
 
 {% block content %}
 
-<h1>Welcome!</h1>
+<h1>Welcome {{ user.account.name }}!</h1>
+<hr>
 
-<h3>Profile, financials, help -- buttons</h3>
-<h4>Notifications</h4>
+<h3><a href="#">Profile</a></h3>
+<h3><a href="#">Financials</a></h3> 
+<h3><a href="#">Help</a></h3>
 
 <hr>
 
+<h3>Notifications</h3>
 
-<h3>Score: 1234</h3>
+<hr>
 
-<h3>Groups: (?)</h3>
+<h3><a href="#">Apply for lease</a></h3>
 
-<h3>What else?</h3>
+<hr>
+
+<h3><a href="#">Join Group</a></h3>
+
+<hr>
 
 {% endblock %}

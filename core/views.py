@@ -14,7 +14,7 @@ from core.models import *
 @login_required(login_url='/login/')
 def index(request):
 
-	context = {'message': "hello"}
+	context = {'user': request.user}
 	
 	return render(request, 'core/index.html', context)
 
@@ -56,7 +56,7 @@ def login(request):
 				if not Account.objects.filter(user=request.user).exists():
 					return redirect('account-setup')
 				else:
-					return redirect('/login/')
+					return redirect('/')
 			else:
 				messages.add_message(request, messages.ERROR, 'Invalid login credentials.')
 				return redirect('/login/')
@@ -90,11 +90,15 @@ def account_setup(request):
 
 @login_required(login_url='login')
 def history(request):
+
 	employment_form = EmploymentForm()
 	prev_employment = Employment.objects.filter(account=request.user.account)
+	file_form = IdentificationForm()
 
 	context = {'employment_form': employment_form,
-			   'employment': prev_employment}
+			   'employment': prev_employment,
+			   'file_form': file_form,
+			   'user': request.user}
 
 	if request.method == 'POST':
 		action = request.POST.get('action')
@@ -109,6 +113,15 @@ def history(request):
 			else:
 				print(form.errors)
 				messages.add_message(request, messages.ERROR, 'Invalid form')
+		elif action == 'add_id':
+			form = IdentificationForm(request.POST, request.FILES)
+			if form.is_valid():
+				identification = form.save(commit=False)
+				identification.account = request.user.account
+				identification.save()
+				messages.add_message(request, messages.SUCCESS, 'ID Added')
+			else:
+				print(form.errors)
 
 	return render(request, 'core/history.html', context)
 
