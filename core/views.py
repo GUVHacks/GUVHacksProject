@@ -75,7 +75,7 @@ def account_setup(request):
 	context = {'account_form': account_form}
 
 	if request.method == 'POST':
-		form = AccountForm(request.POST)
+		form = AccountForm(request.POST, request.FILES)
 		if form.is_valid():
 			account = form.save(commit=False)
 			account.user = request.user
@@ -94,11 +94,14 @@ def history(request):
 	employment_form = EmploymentForm()
 	prev_employment = Employment.objects.filter(account=request.user.account)
 	file_form = IdentificationForm()
+	# prefill if it already exists, and dont create a new one
+	fin_info_form = FinancialInfoForm()
 
 	context = {'employment_form': employment_form,
 			   'employment': prev_employment,
 			   'file_form': file_form,
-			   'user': request.user}
+			   'user': request.user,
+			   'fin_info_form': fin_info_form}
 
 	if request.method == 'POST':
 		action = request.POST.get('action')
@@ -122,6 +125,17 @@ def history(request):
 				messages.add_message(request, messages.SUCCESS, 'ID Added')
 			else:
 				print(form.errors)
+		elif action == 'fin_info':
+			form = FinancialInfoForm(request.POST)
+			if form.is_valid():
+				fin_info = form.save(commit=False)
+				fin_info.account = request.user.account
+				fin_info.save()
+				messages.add_message(request, messages.SUCCESS, 'Information saved.')
+			else:
+				print(form.errors)
+
+
 
 	return render(request, 'core/history.html', context)
 

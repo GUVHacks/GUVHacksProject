@@ -8,3 +8,4 @@ from core.models import *
 admin.site.register(Account)
 admin.site.register(Employment)
 admin.site.register(Identification)
+admin.site.register(FinancialInfo)
