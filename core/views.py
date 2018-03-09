@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.views.generic import UpdateView
 
 from core.forms import *
 from core.models import *
@@ -138,6 +139,84 @@ def history(request):
 
 
 	return render(request, 'core/history.html', context)
+
+
+@login_required(login_url='login')
+def profile(request):
+
+	profile = request.user.account
+
+	context = {'profile': profile}
+	return render(request, 'core/profile.html', context)
+
+
+class EditPersonalInfoView(UpdateView):
+    model = Account
+    form_class = AccountForm
+    template_name = "core/edit-profile.html"
+
+    def get_object(self, *args, **kwargs):
+        user = self.request.user
+
+        return user.account
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse('profile')
+
+
+
+@login_required(login_url='login')
+def financials(request):
+
+	employment_form = EmploymentForm()
+	financials = FinancialInfo.objects.get(account=request.user.account)
+	account = request.user.account
+	context = {'account': account,
+			   'financials': financials,
+			   'employment_form': employment_form}
+
+
+	if request.method == 'POST':
+		action = request.POST.get('action')
+		print(action)
+		if action == 'add_employment':
+			form = EmploymentForm(request.POST)
+			if form.is_valid():
+				employment = form.save(commit=False)
+				employment.account = request.user.account
+				employment.save()
+				messages.add_message(request, messages.SUCCESS, 'Employment Added')
+			else:
+				print(form.errors)
+				messages.add_message(request, messages.ERROR, 'Invalid form')
+		elif action == 'delete_employment':
+			pk = request.POST.get('pk')
+			employment = Employment.objects.get(pk=pk)
+			employment.delete()
+
+	return render(request, 'core/financials.html', context)
+
+
+class EditFinancialInfoView(UpdateView):
+    model = FinancialInfo
+    form_class = FinancialInfoForm
+    template_name = "core/edit-financials.html"
+
+    def get_object(self, *args, **kwargs):
+        user = self.request.user
+        financials = FinancialInfo.objects.get(account=user.account)
+
+        return financials
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse('financials')
+
+
+
+@login_required(login_url='login')
+def faq(request):
+	context = {}
+	return render(request, 'core/faq.html', context)
 
 
 @login_required(login_url='login')
