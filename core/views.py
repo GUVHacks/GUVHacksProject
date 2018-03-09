@@ -8,6 +8,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic import UpdateView
+from creditScore import creditScore
 
 from core.forms import *
 from core.models import *
@@ -134,10 +135,12 @@ def history(request):
 				fin_info.account = request.user.account
 				fin_info.save()
 				messages.add_message(request, messages.SUCCESS, 'Information saved.')
+				credit_score = getUpdatedCreditScore(request)
+				print(credit_score)
+				account.credit_score = credit_score
+				account.save()
 			else:
 				print(form.errors)
-
-
 
 	return render(request, 'core/history.html', context)
 
@@ -213,7 +216,6 @@ class EditFinancialInfoView(UpdateView):
         return reverse('financials')
 
 
-
 @login_required(login_url='login')
 def faq(request):
 	context = {}
@@ -226,5 +228,44 @@ def logout(request):
     messages.add_message(request, messages.SUCCESS, 'Logged out successfully.')
     return redirect('/')
 
+#Param list:
+#country: string: "Italy" or "Germany" or "France"
+#curIncMo: int or float: current monthly income if user input is hourly wage, 
+#            curIncMo = 200*wage (consider working 200 hours per month)
+#workExp: boolean. If user has work experience: True, else: False
+#bankAcc: Boolean. If user has bank account: True, else: False
+#bankBal: int or float: user's bank account balance
+#cashBal: int or float: user's cash available for purchase
+#arrLenMo: int: months that the user has been to Europe
+#outDebt: Boolean: if the user has outstanding debt/loan from bank or NGO: True
+#outDebtAmt: int or float: amount of the debt 
+#outDebtTerm: int: number of months for the debt
+#paidDebt: Boolean: if the user has been issued loan and the loan has been fully repaid
+#misPay: Boolean: if the user has any missed payment in the past 2 years 
+#misPayFreq: int: total frequencies the user missed a payment in the past 2 years 
+ 
 
+def getUpdatedCreditScore(request):
+	#country, curIncMo, curHouseExp,workExp, bankAcc, bankBal, cashBal,arrLenMo,outDebt, outDebtAmt, outDebtTerm, paidDebt, misPay, misPayFreq
+	account = request.user.account
+	financials = FinancialInfo.objects.get(account=account)
+	country = account.country
+	curIncMo = financials.monthly_income
+	curHouseExp = financials.housing_expense
+	workExp = Employment.objects.filter(account=request.user.account).exists()
+	bankAcc = financials.has_bank_account
+	bankBal = financials.amount_in_bank
+	cashBal = financials.amount_cash
+	arrLenMo = financials.time_in_europe
+	outDebt = financials.ongoing_debt
+	outDebtAmt = financials.amount_debts
+	outDebtTerm = financials.num_months_debt
+	# the user has previously had debt and it is not ongoing, meaning it has been repaid
+	paidDebt = financials.has_debts and (not financials.ongoing_debt) 
+	misPay = (financials.missed_payments != 0)
+	misPayFreq = financials.missed_payments
+
+	credit_score = creditScore(curIncMo, curHouseExp, workExp, bankAcc, bankBal, cashBal,arrLenMo,outDebt, outDebtAmt, outDebtTerm, paidDebt, misPay, misPayFreq)
+
+	return credit_score
 

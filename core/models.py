@@ -29,6 +29,8 @@ class Account(models.Model):
 	profile_photo = models.FileField(null=True, upload_to="profile_photos/")
 	credit_score = models.IntegerField(blank=True, null=True)
 
+	has_lease = models.BooleanField(default=False)
+
 
 class Employment(models.Model):
 	account = models.ForeignKey(Account)
@@ -60,15 +62,32 @@ class FinancialInfo(models.Model):
 	amount_cash = models.DecimalField(decimal_places=2, max_digits=12,blank=True, null=True)
 
 	has_debts = models.BooleanField(default=False)
-	amount_debts = models.DecimalField(decimal_places=2, max_digits=12, blank=True, null=True)
-	num_months_debt = models.IntegerField(blank=True, null=True)
+	amount_debts = models.DecimalField(decimal_places=2, max_digits=12, blank=True, default=0)
+	num_months_debt = models.IntegerField(blank=True, null=True, default=0)
 	ongoing_debt = models.BooleanField(default=False)
-	reason_ongoing = models.CharField(max_length=256, choices=REASONS)
+	reason_ongoing = models.CharField(max_length=256, choices=REASONS, blank=True, null=True)
 
 	# What more needs to go here?
-	missed_payments = models.IntegerField(blank=True, null=True)
+	missed_payments = models.IntegerField(blank=True, null=True, default=0)
 
 	loan_file = models.FileField(upload_to="loan_docs/", blank=True, null=True)
 
+
+class Group(models.Model):
+	name = models.CharField(max_length=256)
+	code = models.CharField(max_length=256)
+
+
+class Lease(models.Model):
+	account = models.OneToOneField(Account)
+
+	amount = models.DecimalField(decimal_places=2, max_digits=12, default=0)
+	leaser_name = models.CharField(max_length=256)
+	leaser_email = models.CharField(max_length=256)
+
+	guaranter_name = models.CharField(max_length=256)
+	guranter_email = models.CharField(max_length=256)
+
+	group = models.ForeignKey(Group)
 
 

@@ -1,10 +1,9 @@
-import numpy as np
-import pandas as pd
+import math
 
 #Param list:
-#country: string: "Italy" or "Germany" or "France"
 #curIncMo: int or float: current monthly income if user input is hourly wage, 
 #            curIncMo = 200*wage (consider working 200 hours per month)
+#curHouseExp: int: current housing expense per month
 #workExp: boolean. If user has work experience: True, else: False
 #bankAcc: Boolean. If user has bank account: True, else: False
 #bankBal: int or float: user's bank account balance
@@ -17,13 +16,15 @@ import pandas as pd
 #misPay: Boolean: if the user has any missed payment in the past 2 years 
 #misPayFreq: int: total frequencies the user missed a payment in the past 2 years 
  
+def creditScore(curIncMo, curHouseExp,workExp, bankAcc, bankBal, cashBal,arrLenMo,outDebt, outDebtAmt, outDebtTerm, paidDebt, misPay, misPayFreq):
+    arrLen = arrLenMo / float(12)
 
-def creditScore(country, curIncMo, curHouseExp,workExp, bankAcc, bankBal, cashBal,arrLenMo,outDebt, outDebtAmt, outDebtTerm, paidDebt, misPay, misPayFreq):
-    arrLen = arrLenMo / 12
+    if arrLen == 0:
+        return 0
+
     if not workExp and curIncMo ==0:
         return 0
     
-    df = pd.read_csv('EUEmployment.csv')
     moneyAvail = bankBal + cashBal
 
     if outDebt:
@@ -33,12 +34,12 @@ def creditScore(country, curIncMo, curHouseExp,workExp, bankAcc, bankBal, cashBa
     pt = 0
     
     if (misPay) & (misPayFreq/arrLen >=2): 
-        pt = pt - np.log(misPayFreq)*10/min(arrLen,2)
+        pt = pt - math.log(misPayFreq)*10/min(arrLen,2)
     else:
         pt = pt+20
         
-    if (curHouseExp+moLIAB)/curIncMo > float(df.loc[df['country'] == country,'housePercent']):
-        penalty =((curHouseExp+moLIAB)/curIncMo-float(df.loc[df['country'] == country,'housePercent'])) *100
+    if (curHouseExp+moLIAB)/curIncMo > .3:
+        penalty =(((curHouseExp+moLIAB)/curIncMo)-.3) *100
         if penalty > 30:
             penalty = 30
         pt = pt - penalty
@@ -46,7 +47,7 @@ def creditScore(country, curIncMo, curHouseExp,workExp, bankAcc, bankBal, cashBa
         pt = pt+30
         
     if arrLen > 1:
-        pt = pt+np.log(arrLen)*10
+        pt = pt+math.log(arrLen)*10
         
     if bankAcc:
         pt = pt+5
@@ -62,6 +63,3 @@ def creditScore(country, curIncMo, curHouseExp,workExp, bankAcc, bankBal, cashBa
     
     return int(min(pt,100))
         
-
-
-
