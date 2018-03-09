@@ -1,0 +1,15 @@
+{% extends 'core/base/base.html' %}
+
+{% block content %}
+  <h1>Account Details</h1>
+  <hr>
+  <form method="post">
+    {% csrf_token %}
+    {{ account_form.as_p }}
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+
+  <p>ID Photo Upload</p>
+  <p>Prof pic upload</p>
+
+{% endblock %}

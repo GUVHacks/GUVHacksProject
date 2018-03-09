@@ -1,0 +1,90 @@
+{% extends 'core/base/base.html' %}
+
+{% block content %}
+  <h1>Add Financial Background</h1>
+  <hr>
+
+  <table class="table">
+  	<thead>
+  		<th>Employer</th>
+  		<th>Start Date</th>
+  		<th>End Date</th>
+  		<th>Currently Employed</th>
+  		<th>Wage</th>
+  	</thead>
+  	<tbody>
+  		{% for entry in employment %}
+  		<tr>
+  			<td>{{ entry.employer }}</td>
+  			<td>{{ entry.start_date }}</td>
+  			<td>{{ entry.end_date }}</td>
+  			<td>{{ entry.currently_employed }}</td>
+  			<td>{{ entry.wage }}</td>
+  		</tr>
+  		{% endfor %}
+  	</tbody>
+
+    <p>Note for form: If you have paystub, etc upload to verify employment. Otherwise, employer will be contacted. </p>
+
+  </table>
+
+  <br>
+
+	<!-- Button trigger modal -->
+	<button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#myModal">
+	  Add previous employment
+	</button>
+
+  <hr>
+
+  <p>  Employment history for the past 2 years including wage per hour or salary per month. Gap between two jobs if any. 
+
+Current monthly income or wage per hour
+
+current housing expense per month
+
+How long have you been to Europe?
+
+Do you have a bank account? If so, How long? What’s balance? 
+
+How much cash do you have now? 
+
+Do you have any outstanding debts? If so how much and how long is the term?
+
+Did you own any debts and paid off already in the past 5 years? If so, how much. Start and end month
+
+Have you ever missed a payment such as debt, credit card and rent in the past 2 years? If so, choose category(debt, credit card or rent) and frequency in the past 2 years</p>
+
+  <hr>
+
+  <a href="{% url 'index' %}" class="btn btn-primary">Continue</a>
+
+
+
+<!-- Employment Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="post">
+	      <div class="modal-body">
+	      		{% csrf_token %}
+	        	{{ employment_form.as_p }}
+	        	<input type="hidden" name="action" value="add_employment">
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	        <button type="submit" class="btn btn-primary">Add</button>
+	      </div>
+  	  </form>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
