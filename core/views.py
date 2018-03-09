@@ -15,7 +15,8 @@ from core.models import *
 @login_required(login_url='/login/')
 def index(request):
 
-	context = {'user': request.user}
+	context = {'user': request.user,
+			   'credit_score': request.user.account.credit_score}
 	
 	return render(request, 'core/index.html', context)
 
@@ -227,4 +228,3 @@ def logout(request):
 
 
 
-	

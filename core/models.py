@@ -27,6 +27,7 @@ class Account(models.Model):
 	age = models.IntegerField()
 	country = models.CharField(max_length=256, choices=COUNTRIES)
 	profile_photo = models.FileField(null=True, upload_to="profile_photos/")
+	credit_score = models.IntegerField(blank=True, null=True)
 
 
 class Employment(models.Model):
