@@ -2,25 +2,27 @@
 
 {% block content %}
 
-<h1>Welcome {{ user.account.name }}!</h1>
-<hr>
 
-<h3><a href="{% url 'profile' %}">Profile</a></h3>
-<h3><a href="{% url 'financials' %}">Financials</a></h3> 
-<h3><a href="{% url 'faq' %}">Help</a></h3>
 
-<hr>
-
-<h3>Notifications</h3>
-
-<hr>
-
-<h3><a href="#">Apply for lease</a></h3>
-
-<hr>
-
-<h3><a href="#">Join Group</a></h3>
-
-<hr>
+<div class="container container-fluid">
+    <div class="buttons-box">
+        <div class="buttons-box-button">
+            <div class="button-image" style="background-image:url('')"></div>
+            <div class="button-label-content">Profile</div>
+        </div>
+        <div class="buttons-box-button">
+            <div class="button-image financials-icon"></div>
+            <div class="button-label-content">Financials</div>
+        </div>
+        <div class="buttons-box-button ">
+            <div class="button-image notifications-icon"></div>
+            <div class="button-label-content">Notifications</div>
+        </div>
+        <div class="buttons-box-button ">
+            <div class="button-image help-icon"></div>
+            <div class="button-label-content">Help</div>
+        </div>
+    </div> <!--buttons-box-->
+</div> <!--container-->
 
 {% endblock %}
