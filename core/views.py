@@ -224,3 +224,7 @@ def logout(request):
     auth_logout(request)
     messages.add_message(request, messages.SUCCESS, 'Logged out successfully.')
     return redirect('/')
+
+
+
+	
