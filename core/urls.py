@@ -2,6 +2,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from core import views
 from django.contrib.auth import views as auth_views
+from .views import EditPersonalInfoView, EditFinancialInfoView
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
@@ -10,4 +11,9 @@ urlpatterns = [
     url(r'^logout/$', views.logout, name='logout'),
     url(r'^account-setup/$', views.account_setup, name='account-setup'),
     url(r'^history/$', views.history, name='history'),
+    url(r'^profile/$', views.profile, name='profile'),
+    url(r'^financials/$', views.financials, name='financials'),
+    url(r'^faq/$', views.faq, name='faq'),
+    url(r'^edit-profile/', EditPersonalInfoView.as_view(), name="edit_profile"),
+    url(r'^edit-financials/', EditFinancialInfoView.as_view(), name="edit-financials"),
 ]

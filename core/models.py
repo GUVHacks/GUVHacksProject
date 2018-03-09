@@ -41,6 +41,8 @@ class Identification(models.Model):
 
 
 class FinancialInfo(models.Model):
+	account = models.ForeignKey(Account)
+
 	monthly_income = models.DecimalField(decimal_places=2, max_digits=12, default=0)
 	housing_expense = models.DecimalField(decimal_places=2, max_digits=12, default=0)
 	
