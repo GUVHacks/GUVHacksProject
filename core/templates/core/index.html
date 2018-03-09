@@ -78,6 +78,7 @@
 </script>
 
 <div class="container container-fluid">
+	<div class="row">
 	<!--credit indicator shape-->
 		<svg version="1.0" id="score-viewer" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 			 viewBox="0 0 400 400" enable-background="new 0 0 400 400" xml:space="preserve">
@@ -97,22 +98,23 @@
 		</svg>
     <div class="buttons-box">
         <div class="buttons-box-button">
-            <div class="button-image" style="background-image:url('')"></div>
+            <a href="/profile"><div class="button-image" style="background-image:url('')"></div></a>
             <div class="button-label-content">Profile</div>
         </div>
-        <div class="buttons-box-button">
-            <div class="button-image financials-icon"></div>
+        <a href="/financials"><div class="buttons-box-button">
+            <a href="/financials/"><div class="button-image financials-icon"></div></a>
             <div class="button-label-content">Financials</div>
         </div>
         <div class="buttons-box-button ">
-            <div class="button-image notifications-icon"></div>
+            <a href="#"><div class="button-image notifications-icon"></div></a>
             <div class="button-label-content">Notifications</div>
         </div>
-        <div class="buttons-box-button ">
-            <div class="button-image help-icon"></div>
+		<div class="buttons-box-button ">
+            <a href="/faq"><div class="button-image help-icon"></div></a>
             <div class="button-label-content">Help</div>
         </div>
     </div> <!--buttons-box-->
+</div>
 </div> <!--container-->
 
 {% endblock %}
