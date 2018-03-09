@@ -15,7 +15,8 @@ from core.models import *
 @login_required(login_url='/login/')
 def index(request):
 
-	context = {'user': request.user}
+	context = {'user': request.user,
+			   'credit_score': request.user.account.credit_score}
 	
 	return render(request, 'core/index.html', context)
 
@@ -224,3 +225,6 @@ def logout(request):
     auth_logout(request)
     messages.add_message(request, messages.SUCCESS, 'Logged out successfully.')
     return redirect('/')
+
+
+
