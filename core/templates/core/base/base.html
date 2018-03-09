@@ -9,10 +9,11 @@
         <meta name="description" content="">
         <meta name="author" content="GUVHacks">
         <link rel="icon" href="{% static 'core/site.ico' %}">
-        <title>Project Name</title>
+        <title>Credit Ability</title>
 
         <!-- Custom styles for this template -->
         <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'custom.css' %}" />
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     </head>
 
@@ -24,17 +25,14 @@
         <br>
 
         <div class="container container-fluid">
-        <div class="row">
-            <!-- Page container -->
-            <div class="col col-md-8">
+                <!-- Page container -->                
                 <div class="page-container">
-                    {% block messages %}
-                        {% include 'core/base/messages.html' %}
-                    {% endblock %}
-                    {% block content %}
-                    {% endblock %}
+                        {% block messages %}
+                            {% include 'core/base/messages.html' %}
+                        {% endblock %}
+                        {% block content %}
+                        {% endblock %}
                 </div>
-            </div>
         </div>
 
         <br>

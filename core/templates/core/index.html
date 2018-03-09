@@ -2,25 +2,119 @@
 
 {% block content %}
 
-<h1>Welcome {{ user.account.name }}!</h1>
-<hr>
+<script>
+	/*
+	 * Produces pretty score indicator--also works without js
+	 */
+	var colorsByScore = {
+		bad:"#f94b5c",
+		weak:"#fff24d",
+		okay:"#f7bb63",
+		good: "#2ecc71",
+		excellent: "#2ecc71"
+	};
+	var score = {{credit_score}};
 
-<h3><a href="{% url 'profile' %}">Profile</a></h3>
-<h3><a href="{% url 'financials' %}">Financials</a></h3> 
-<h3><a href="{% url 'faq' %}">Help</a></h3>
+	$(document).ready(function(){
+		//unhide foreground, now that we know JS is working
+		//$("#foreground").show();
 
-<hr>
+		//fill score text
+		$("#score-text").html(score);
 
-<h3>Notifications</h3>
+		var coords = [[50.0,250.0]]; // initial point
+		if (score >=50){
+			var sc = (score-50)/50 * 250;
+			xCoord = .6*sc + 200.0;
+			yCoord = .8*sc + 50.0;
 
-<hr>
+			//middle point
+			coords.push([200.0,50.0]);
+			//terminal point
+			coords.push([xCoord,yCoord]);
+		} else if (score == 50) {
+			//middle pt
+			coords.push([200.0,50.0]);
+		} else if (score > 0) {
+			var sc = (score)/50 * 250;
+			xCoord = .6*sc+50;
+			yCoord = 250-.8*sc;
+			//second point (no middle pt since on left side of path)
+			coords.push([xCoord,yCoord]);
+		} else { //BAD, score is <= 0
+			$("#foreground").attr("stroke","none");
+			$("#background").attr("stroke",colorsByScore["bad"]);
 
-<h3><a href="#">Apply for lease</a></h3>
+			//fill score text
+			$("#score-text").html("!");
+			$("#score-text").attr("style","fill:"+colorsByScore["bad"]);
 
-<hr>
+		}
+		oString = "";
+		for (var i = 0; i < coords.length; i++){
+			console.log(coords[i][0]+","+coords[i][1]+" ");
+			oString += (coords[i][0]+","+coords[i][1]+" ");			
+		}
+		$("#foreground").attr("points",oString);
+		//color of score text
+		if (score < 40 && score > 0){ 
+			$("#score-text").attr("style","fill:"+colorsByScore["weak"]);
+			$("#foreground").attr("stroke",colorsByScore["weak"]);
+			$("#comment-text").html("Weak");
+		} else if (score >= 40 && score < 60) {
+			$("#score-text").attr("style","fill:"+colorsByScore["okay"]);
+			$("#foreground").attr("stroke",colorsByScore["okay"]);
+			$("#comment-text").html("Okay");
+		} else if (score >= 60 && score < 80) {
+			$("#score-text").attr("style","fill:"+colorsByScore["good"]);
+			$("#foreground").attr("stroke",colorsByScore["good"]);
+			$("#comment-text").html("Good");
+		} else if (score >= 80) {
+			$("#score-text").attr("style","fill:"+colorsByScore["excellent"]);
+			$("#foreground").attr("stroke",colorsByScore["excellent"]);
+			$("#comment-text").html("Excellent");
+		}			
+	});
+</script>
 
-<h3><a href="#">Join Group</a></h3>
+<div class="container container-fluid">
+	<div class="row">
+	<!--credit indicator shape-->
+		<svg version="1.0" id="score-viewer" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+			 viewBox="0 0 400 400" enable-background="new 0 0 400 400" xml:space="preserve">
 
-<hr>
+		<!--background shape-->
+		<polyline id="background" fill="none" stroke="#cccccc" stroke-width="60" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+			50,250 200,50 350,250 "/>
+		<!--foreground shape-->
+		<polyline id="foreground" fill="none" stroke="none" stroke-width="60" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+			50,250 200,50 275,150 "/>
+		<!--score text-->
+		<text id="score-text" text-anchor="middle" x="200" y="250" font-size="72" font-family="Helvetica"></text>
+		<!--dividing line-->
+		<polyline id="divider-line" stroke="#cccccc" stroke-width="1" points="50,295 350,295" />
+		<!--comment text-->
+		<text id="comment-text" text-anchor="middle" x="200" y="344" font-size="48" style="fill:#777777"font-family="Helvetica"></text>
+		</svg>
+    <div class="buttons-box">
+        <div class="buttons-box-button">
+            <a href="/profile"><div class="button-image" style="background-image:url('')"></div></a>
+            <div class="button-label-content">Profile</div>
+        </div>
+        <a href="/financials"><div class="buttons-box-button">
+            <a href="/financials/"><div class="button-image financials-icon"></div></a>
+            <div class="button-label-content">Financials</div>
+        </div>
+        <div class="buttons-box-button ">
+            <a href="#"><div class="button-image notifications-icon"></div></a>
+            <div class="button-label-content">Notifications</div>
+        </div>
+		<div class="buttons-box-button ">
+            <a href="/faq"><div class="button-image help-icon"></div></a>
+            <div class="button-label-content">Help</div>
+        </div>
+    </div> <!--buttons-box-->
+</div>
+</div> <!--container-->
 
 {% endblock %}
