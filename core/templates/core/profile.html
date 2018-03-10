@@ -21,4 +21,23 @@
 
 <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit</a>
 
+<hr>
+
+<!-- generate random key -->
+<h4>Share Your Profile With a Potiential Leaser</h4>
+<form method="post">
+	{% csrf_token %}
+	<input type="hidden" name="action" value="share">
+	<p>Potential Leaser Email Address: <input type="text" name="email"></p>
+	<button type="submit" class="btn btn-primary">Send to Employer</button>
+</form>
+
+<hr>
+<!-- reset random key -->
+<form method="post">
+	{% csrf_token %}
+	<input type="hidden" name="action" value="reset">
+	<button type="submit" class="btn btn-danger">Reset view permission</button>
+</form>
+
 {% endblock %}
