@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from . import secrets
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,6 +27,21 @@ SECRET_KEY = 'f8h)0j^cv_ss5%6lx)(0te$e*4j6tow9)9=-&yrf5!ppeb6vew'
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+DEVELOPER_EMAILS = [
+    'rem99@georgetown.edu',
+    'jag419@georgetown.edu',
+    'rs1681@georgetown.edu',
+    'lco6@georgetown.edu',
+    'yw516@georgetown.edu',
+]
+
+# Example for using Gmail
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'credit.ability.mailer@gmail.com'
+EMAIL_HOST_PASSWORD = secrets.password
 
 
 # Application definition

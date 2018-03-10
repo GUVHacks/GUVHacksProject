@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic import UpdateView
 from .creditScore import creditScore
+from django.core.mail import send_mail
 
 from core.forms import *
 from core.models import *
