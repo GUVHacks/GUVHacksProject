@@ -53,3 +53,19 @@ class FinancialInfoForm(forms.ModelForm):
 		fields = ('monthly_income', 'housing_expense', 'time_in_europe', 'has_bank_account', 'num_months_debt',
 				  'amount_in_bank', 'amount_cash', 'has_debts', 'amount_debts', 
 				  'num_months_debt', 'ongoing_debt', 'reason_ongoing', 'missed_payments', 'loan_file')
+
+
+class LeaseForm(forms.ModelForm):
+
+	class Meta:
+		model = Lease
+		fields = ('amount', 'leaser_name', 'leaser_email', 'duration')
+
+class CreateGroupForm(forms.ModelForm):
+	
+	class Meta:
+		model = Group
+		fields = ('code',)
+
+class JoinGroupForm(forms.Form):
+	code = forms.CharField()

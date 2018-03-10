@@ -55,6 +55,7 @@ class Account(models.Model):
 	profile_photo = models.FileField(null=True, upload_to="profile_photos/")
 	credit_score = models.IntegerField(blank=True, null=True)
 
+	applied_for_lease = models.BooleanField(default=False)
 	has_lease = models.BooleanField(default=False)
 
 
@@ -66,7 +67,7 @@ class Employment(models.Model):
 	start_date = models.DateField()
 	end_date = models.DateField(blank=True, null=True)
 	currently_employed = models.BooleanField(default=False, verbose_name="Currently Employed")
-	monthly_salary = models.DecimalField(decimal_places=2, max_digits=6, verbose_name="Monthly Salary")
+	monthly_salary = models.DecimalField(decimal_places=2, max_digits=12, verbose_name="Monthly Salary")
 	
 	#make automatic updating of credit score
 	@staticmethod
@@ -120,7 +121,6 @@ class FinancialInfo(models.Model):
 
 
 class Group(models.Model):
-	name = models.CharField(max_length=256)
 	code = models.CharField(max_length=256)
 
 
@@ -131,10 +131,13 @@ class Lease(models.Model):
 	leaser_name = models.CharField(max_length=256)
 	leaser_email = models.CharField(max_length=256)
 
-	guarantor_name = models.CharField(max_length=256)
-	gurantor_email = models.CharField(max_length=256)
+	guarantor_name = models.CharField(max_length=256, blank=True, null=True)
+	gurantor_email = models.CharField(max_length=256, blank=True, null=True)
 
-	group = models.ForeignKey(Group)
+	duration = models.IntegerField(default=12) # in months
+	payments_made = models.IntegerField(default=0, blank=True) # in months
+
+	group = models.ForeignKey(Group, blank=True, null=True)
 
 signals.post_save.connect(Employment.post_save, sender=Employment)
 signals.post_save.connect(FinancialInfo.post_save, sender=FinancialInfo)

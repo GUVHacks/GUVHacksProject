@@ -16,4 +16,6 @@ urlpatterns = [
     url(r'^faq/$', views.faq, name='faq'),
     url(r'^edit-profile/', EditPersonalInfoView.as_view(), name="edit_profile"),
     url(r'^edit-financials/', EditFinancialInfoView.as_view(), name="edit-financials"),
+    url(r'^lease-apply/$', views.lease_apply, name='lease-apply'),
+    url(r'^join-group/$', views.join_group, name='join-group'),
 ]
