@@ -198,6 +198,10 @@ class EditPersonalInfoView(UpdateView):
 @login_required(login_url='login')
 def financials(request):
 
+	#check if a financial profile exists for this user--page load will fail without one
+	if not FinancialInfo.objects.filter(account=request.user.account).exists():
+		return redirect('/history/')
+	#otherwise...
 	employment_form = EmploymentForm()
 	financials = FinancialInfo.objects.get(account=request.user.account)
 	account = request.user.account
@@ -223,6 +227,7 @@ def financials(request):
 			pk = request.POST.get('pk')
 			employment = Employment.objects.get(pk=pk)
 			employment.delete()
+
 
 	return render(request, 'core/financials.html', context)
 
