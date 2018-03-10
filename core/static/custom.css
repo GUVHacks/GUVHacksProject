@@ -3,13 +3,14 @@
 	justify-content: space-around;
 	width:100%;
 	flex-wrap:wrap;
+	max-width:720px;
 }
 
 .buttons-box-button {
 	width:49%;
 	height:250px;
 	color:#777;
-	margin-bottom:20px;
+	margin-bottom:10px;
 }
 
 .button-label-content {
