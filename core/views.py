@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import random
+import string
 
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import authenticate
@@ -150,10 +152,31 @@ def history(request):
 def profile(request):
 
 	profile = request.user.account
-	url = "guvhacks/media/"
+	
+	if request.method == 'POST':
+		action = request.POST.get('action')
+		if action == 'share':
+			if profile.share_key is None:
+				profile.share_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
+				print(profile.share_key)
+				profile.save()
+				# send email to leaser
+			email = request.POST.get('email')
+			print(email)
+			send_mail(
+				'Credit/Ability Score for ' + str(profile.name),
+				'View the creditability score for ' + str(profile.name) + ' here: localhost:8000/viewinfo/' + profile.share_key,
+				'mailer@creditability.com',
+				[email],
+				fail_silently=False,
+			)
+			messages.add_message(request, messages.SUCCESS, 'Message Sent!')
+		elif action == 'reset':
+			profile.share_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
+			print(profile.share_key)
+			profile.save()
 
-	context = {'profile': profile,
-			   'url': url}
+	context = {'profile': profile}
 	return render(request, 'core/profile.html', context)
 
 
@@ -286,6 +309,19 @@ def logout(request):
     auth_logout(request)
     messages.add_message(request, messages.SUCCESS, 'Logged out successfully.')
     return redirect('/')
+
+
+def leaser_view(request, share_key):
+	print(share_key)
+	access = False
+	profile = None
+	if Account.objects.filter(share_key=share_key).exists():
+		access = True
+		profile = Account.objects.get(share_key=share_key)
+		print(profile)
+	context = {'profile': profile,
+			   'access': access}
+	return render(request, 'core/leaser_view.html', context)
  
 
 
