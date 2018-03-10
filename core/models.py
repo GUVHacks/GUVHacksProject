@@ -74,10 +74,12 @@ class Employment(models.Model):
 	def post_save(sender, **kwargs):
 		instance = kwargs.get('instance')
 		created = kwargs.get('created')
-		score = getUpdatedCreditScore(instance.account.user)
-		instance.account.credit_score = score
-		instance.account.save()
-		print("Updating score:",score,"\nScore on account is:",instance.account.credit_score)
+		if FinancialInfo.objects.filter(account=instance.account).exists():
+			
+			score = getUpdatedCreditScore(instance.account.user)
+			instance.account.credit_score = score
+			instance.account.save()
+			print("Updating score:",score,"\nScore on account is:",instance.account.credit_score)
 
 
 class Identification(models.Model):

@@ -122,13 +122,13 @@ def history(request):
 				messages.add_message(request, messages.ERROR, 'Invalid form')
 		elif action == 'add_id':
 			form = IdentificationForm(request.POST, request.FILES)
-			if form.is_valid():
+			if form.is_valid() and not Identification.objects.filter(account=request.user.account).exists():
 				identification = form.save(commit=False)
 				identification.account = request.user.account
 				identification.save()
 				messages.add_message(request, messages.SUCCESS, 'ID Added')
 			else:
-				print(form.errors)
+				print(request.user.account.id)
 		elif action == 'fin_info':
 			form = FinancialInfoForm(request.POST)
 			if form.is_valid():
