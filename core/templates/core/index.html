@@ -96,25 +96,38 @@
 		<!--comment text-->
 		<text id="comment-text" text-anchor="middle" x="200" y="344" font-size="48" style="fill:#777777"font-family="Helvetica"></text>
 		</svg>
-    <div class="buttons-box">
-        <div class="buttons-box-button">
-            <a href="/profile"><div class="button-image" style="background-image:url('')"></div></a>
-            <div class="button-label-content">Profile</div>
-        </div>
-        <a href="/financials"><div class="buttons-box-button">
-            <a href="/financials/"><div class="button-image financials-icon"></div></a>
-            <div class="button-label-content">Financials</div>
-        </div>
-        <div class="buttons-box-button ">
-            <a href="#"><div class="button-image notifications-icon"></div></a>
-            <div class="button-label-content">Notifications</div>
-        </div>
-		<div class="buttons-box-button ">
-            <a href="/faq"><div class="button-image help-icon"></div></a>
-            <div class="button-label-content">Help</div>
-        </div>
-    </div> <!--buttons-box-->
-</div>
+	<!--buttons box for nav-->
+	    <div class="buttons-box">
+	        <div class="buttons-box-button">
+	            <a href="/profile"><div class="button-image" style="background-image:url('')"></div></a>
+	            <div class="button-label-content">Profile</div>
+	        </div>
+	        <a href="/financials"><div class="buttons-box-button">
+	            <a href="/financials/"><div class="button-image financials-icon"></div></a>
+	            <div class="button-label-content">Financials</div>
+	        </div>
+	        <div class="buttons-box-button ">
+	            <a href="#"><div class="button-image notifications-icon"></div></a>
+	            <div class="button-label-content">Notifications</div>
+	        </div>
+			<div class="buttons-box-button ">
+	            <a href="/faq"><div class="button-image help-icon"></div></a>
+	            <div class="button-label-content">Help</div>
+	        </div>
+	    </div> <!--buttons-box-->
+    </div><!--/row-->
+    <div class="row">
+	    <!--action button-->
+		{% if user.account.has_lease %}
+			<a href="/join-group">
+				<button type="button" class="btn btn-primary">Join Lease Insurance Group</button>
+			</a>
+		{% else %}
+			<a href="/lease-apply">
+				<button type="button" class="btn btn-primary">Apply for Lease Support</button>
+			</a>    	
+		{% endif %}
+	</div><!--/row-->
 </div> <!--container-->
 
 {% endblock %}
