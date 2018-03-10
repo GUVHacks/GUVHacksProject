@@ -148,7 +148,7 @@ def history(request):
 			else:
 				print(form.errors)
 
-	return render(request, 'core/index.html', context)
+	return render(request, 'core/history.html', context)
 
 
 @login_required(login_url='login')
