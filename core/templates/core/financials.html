@@ -68,7 +68,7 @@
   <p>Is the debt ongoing? {{ financials.ongoing_debt }}</p>
   <p>Why is the debt ongoing? {{ financials.reason_ongoing }}</p>
   <p>Number of missed payments: {{ financials.missed_payments }}</p>
-  <p>Loan file: {{ financials.loan_file }}</p>
+  <p>Loan file: <img src="{{ financials.loan_file.url }}" style="width:50%"></p>
 
   <a href="{% url 'edit-financials' %}" class="btn btn-primary">Edit</a>
 

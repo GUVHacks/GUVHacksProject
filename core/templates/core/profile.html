@@ -14,6 +14,11 @@
 <p>Phone: {{ profile.phone }}</p>
 <p>Age: {{ profile.age }}</p>
 
+<p>Profile Photo:</p>
+<img src="{{profile.profile_photo.url}}" style="width:50%">
+<br>
+<br>
+
 <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit</a>
 
 {% endblock %}
