@@ -226,26 +226,66 @@ def faq(request):
 
 
 @login_required(login_url='login')
+def lease_apply(request):
+	lease_form = LeaseForm()
+
+	context = {'lease_form': lease_form,
+			   'account': request.user.account}
+	if request.method == 'POST':
+		action = request.POST.get('action')
+		if action == 'lease-app':
+			form = LeaseForm(request.POST)
+			if form.is_valid():
+				lease = form.save(commit=False)
+				lease.account = request.user.account
+				lease.save()
+				messages.add_message(request, messages.SUCCESS, 'Application submitted!')
+				request.user.account.applied_for_lease = True
+				request.user.account.save()
+				return redirect('index')
+
+
+	return render(request, 'core/lease-apply.html', context)
+
+
+@login_required(login_url='login')
+def join_group(request):
+	join_form = JoinGroupForm()
+	create_form = CreateGroupForm()
+
+	if request.method == 'POST':
+		action = request.POST.get('action')
+		if action == 'join':
+			form = JoinGroupForm(request.POST)
+			if form.is_valid():
+				my_code = form.cleaned_data['code']
+				if Group.objects.filter(code=my_code).exists():
+					group = Group.objects.get(code=my_code)
+					lease = Lease.objects.get(account=request.user.account)
+					if lease.group is None:
+						lease.group = group
+						lease.save()
+					else:
+						messages.add_message(request, messages.ERROR, "You are already in a group.")
+				else:
+					messages.add_message(request, messages.ERROR, 'Group does not exist.')
+		elif action == 'create':
+			group = CreateGroupForm(request.POST)
+			group.save()
+			messages.add_message(request, messages.ERROR, 'Group created!')
+
+
+	context = {'account': request.user.account,
+			   'join_form': join_form,
+			   'create_form': create_form}
+	return render(request, 'core/join-group.html', context)
+
+
+@login_required(login_url='login')
 def logout(request):
     auth_logout(request)
     messages.add_message(request, messages.SUCCESS, 'Logged out successfully.')
     return redirect('/')
-
-#Param list:
-#country: string: "Italy" or "Germany" or "France"
-#curIncMo: int or float: current monthly income if user input is hourly wage, 
-#            curIncMo = 200*wage (consider working 200 hours per month)
-#workExp: boolean. If user has work experience: True, else: False
-#bankAcc: Boolean. If user has bank account: True, else: False
-#bankBal: int or float: user's bank account balance
-#cashBal: int or float: user's cash available for purchase
-#arrLenMo: int: months that the user has been to Europe
-#outDebt: Boolean: if the user has outstanding debt/loan from bank or NGO: True
-#outDebtAmt: int or float: amount of the debt 
-#outDebtTerm: int: number of months for the debt
-#paidDebt: Boolean: if the user has been issued loan and the loan has been fully repaid
-#misPay: Boolean: if the user has any missed payment in the past 2 years 
-#misPayFreq: int: total frequencies the user missed a payment in the past 2 years 
  
 
 
