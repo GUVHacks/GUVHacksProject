@@ -7,12 +7,13 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.views.generic import UpdateView
 from .creditScore import creditScore
 from django.core.mail import send_mail
 
+from .defaultModel import applicant,individualDefaultRatio
 from core.forms import *
 from core.models import *
 
@@ -271,6 +272,25 @@ def lease_apply(request):
 				messages.add_message(request, messages.SUCCESS, 'Application submitted!')
 				request.user.account.applied_for_lease = True
 				request.user.account.save()
+				print("Leaser risk profile calculation:")
+				acct = request.user.account
+
+				empInfo = Employment.objects.filter(account = acct)
+				employed=False
+				for emp in empInfo:
+					if emp.currently_employed:
+						employed = True
+				finInfo = FinancialInfo.objects.get(account = acct)
+				bankBal = finInfo.amount_in_bank
+				income = finInfo.monthly_income
+				#secondary check
+				if not employed:
+					income = 0
+				remainTerm = lease.months_left_in_current_job
+
+				a = applicant(employed,income,bankBal,remainTerm,income)
+				res = individualDefaultRatio(a,lease.amount,lease.duration)
+				print(res)
 				return redirect('index')
 
 
@@ -330,4 +350,6 @@ def leaser_view(request, share_key):
 	return render(request, 'core/leaser_view.html', context)
  
 
-
+@user_passes_test(lambda u: u.is_superuser)
+def superadmin(request):
+	return render(request, 'core/superadmin.html',context)

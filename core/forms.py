@@ -59,7 +59,7 @@ class LeaseForm(forms.ModelForm):
 
 	class Meta:
 		model = Lease
-		fields = ('amount', 'leaser_name', 'leaser_email', 'duration')
+		fields = ('amount', 'leaser_name', 'leaser_email', 'duration','months_left_in_current_job')
 
 class CreateGroupForm(forms.ModelForm):
 	
