@@ -138,10 +138,10 @@ def history(request):
 				fin_info.account = request.user.account
 				fin_info.save()
 				messages.add_message(request, messages.SUCCESS, 'Information saved.')
-				credit_score = getUpdatedCreditScore(request)
+				credit_score = getUpdatedCreditScore(request.user)
 				print(credit_score)
-				account.credit_score = credit_score
-				account.save()
+				request.user.account.credit_score = credit_score
+				request.user.account.save()
 			else:
 				print(form.errors)
 
@@ -201,35 +201,36 @@ def financials(request):
 	#check if a financial profile exists for this user--page load will fail without one
 	if not FinancialInfo.objects.filter(account=request.user.account).exists():
 		return redirect('/history/')
-	#otherwise...
-	employment_form = EmploymentForm()
-	financials = FinancialInfo.objects.get(account=request.user.account)
-	account = request.user.account
-	context = {'account': account,
-			   'financials': financials,
-			   'employment_form': employment_form}
+	else:
+		#otherwise...
+		employment_form = EmploymentForm()
+		financials = FinancialInfo.objects.get(account=request.user.account)
+		account = request.user.account
+		context = {'account': account,
+				   'financials': financials,
+				   'employment_form': employment_form}
 
 
-	if request.method == 'POST':
-		action = request.POST.get('action')
-		print(action)
-		if action == 'add_employment':
-			form = EmploymentForm(request.POST)
-			if form.is_valid():
-				employment = form.save(commit=False)
-				employment.account = request.user.account
-				employment.save()
-				messages.add_message(request, messages.SUCCESS, 'Employment Added')
-			else:
-				print(form.errors)
-				messages.add_message(request, messages.ERROR, 'Invalid form')
-		elif action == 'delete_employment':
-			pk = request.POST.get('pk')
-			employment = Employment.objects.get(pk=pk)
-			employment.delete()
+		if request.method == 'POST':
+			action = request.POST.get('action')
+			print(action)
+			if action == 'add_employment':
+				form = EmploymentForm(request.POST)
+				if form.is_valid():
+					employment = form.save(commit=False)
+					employment.account = request.user.account
+					employment.save()
+					messages.add_message(request, messages.SUCCESS, 'Employment Added')
+				else:
+					print(form.errors)
+					messages.add_message(request, messages.ERROR, 'Invalid form')
+			elif action == 'delete_employment':
+				pk = request.POST.get('pk')
+				employment = Employment.objects.get(pk=pk)
+				employment.delete()
 
 
-	return render(request, 'core/financials.html', context)
+		return render(request, 'core/financials.html', context)
 
 
 class EditFinancialInfoView(UpdateView):

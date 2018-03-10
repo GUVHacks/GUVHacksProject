@@ -103,7 +103,7 @@ class FinancialInfo(models.Model):
 	
 	has_bank_account = models.BooleanField(default=False)
 	amount_in_bank = models.DecimalField(decimal_places=2, max_digits=12, default=0)
-	amount_cash = models.DecimalField(decimal_places=2, max_digits=12,blank=True, null=True)
+	amount_cash = models.DecimalField(decimal_places=2, max_digits=12,blank=True, null=True,default=0)
 
 	has_debts = models.BooleanField(default=False)
 	amount_debts = models.DecimalField(decimal_places=2, max_digits=12, blank=True, default=0)
@@ -143,6 +143,8 @@ class Lease(models.Model):
 
 	duration = models.IntegerField(default=12) # in months
 	payments_made = models.IntegerField(default=0, blank=True) # in months
+
+	months_left_in_current_job = models.IntegerField(default=0)
 
 	group = models.ForeignKey(Group, blank=True, null=True)
 
