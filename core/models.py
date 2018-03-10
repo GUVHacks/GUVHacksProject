@@ -3,6 +3,32 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import signals
+from .creditScore import creditScore
+
+def getUpdatedCreditScore(user):
+	#country, curIncMo, curHouseExp,workExp, bankAcc, bankBal, cashBal,arrLenMo,outDebt, outDebtAmt, outDebtTerm, paidDebt, misPay, misPayFreq
+	account = user.account
+	financials = FinancialInfo.objects.get(account=account)
+	country = account.country
+	curIncMo = financials.monthly_income
+	curHouseExp = financials.housing_expense
+	workExp = Employment.objects.filter(account=account).exists()
+	bankAcc = financials.has_bank_account
+	bankBal = financials.amount_in_bank
+	cashBal = financials.amount_cash
+	arrLenMo = financials.time_in_europe
+	outDebt = financials.ongoing_debt
+	outDebtAmt = financials.amount_debts
+	outDebtTerm = financials.num_months_debt
+	# the user has previously had debt and it is not ongoing, meaning it has been repaid
+	paidDebt = financials.has_debts and (not financials.ongoing_debt) 
+	misPay = (financials.missed_payments != 0)
+	misPayFreq = financials.missed_payments
+
+	credit_score = creditScore(curIncMo, curHouseExp, workExp, bankAcc, bankBal, cashBal,arrLenMo,outDebt, outDebtAmt, outDebtTerm, paidDebt, misPay, misPayFreq)
+
+	return credit_score
 
 COUNTRIES = (('Italy', 'Italy'),
 			 ('France', 'France'),
@@ -41,6 +67,16 @@ class Employment(models.Model):
 	end_date = models.DateField(blank=True, null=True)
 	currently_employed = models.BooleanField(default=False, verbose_name="Currently Employed")
 	monthly_salary = models.DecimalField(decimal_places=2, max_digits=6, verbose_name="Monthly Salary")
+	
+	#make automatic updating of credit score
+	@staticmethod
+	def post_save(sender, **kwargs):
+		instance = kwargs.get('instance')
+		created = kwargs.get('created')
+		score = getUpdatedCreditScore(instance.account.user)
+		instance.account.credit_score = score
+		instance.account.save()
+		print("Updating score:",score,"\nScore on account is:",instance.account.credit_score)
 
 
 class Identification(models.Model):
@@ -72,6 +108,16 @@ class FinancialInfo(models.Model):
 
 	loan_file = models.FileField(upload_to="loan_docs/", blank=True, null=True)
 
+	#make automatic updating of credit score
+	@staticmethod
+	def post_save(sender, **kwargs):
+		instance = kwargs.get('instance')
+		created = kwargs.get('created')
+		score = getUpdatedCreditScore(instance.account.user)
+		instance.account.credit_score = score
+		instance.account.save()
+		print("Updating score:",score,"\nScore on account is:",instance.account.credit_score)
+
 
 class Group(models.Model):
 	name = models.CharField(max_length=256)
@@ -90,4 +136,5 @@ class Lease(models.Model):
 
 	group = models.ForeignKey(Group)
 
-
+signals.post_save.connect(Employment.post_save, sender=Employment)
+signals.post_save.connect(FinancialInfo.post_save, sender=FinancialInfo)

@@ -8,7 +8,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic import UpdateView
-from creditScore import creditScore
+from .creditScore import creditScore
 
 from core.forms import *
 from core.models import *
@@ -247,27 +247,4 @@ def logout(request):
 #misPayFreq: int: total frequencies the user missed a payment in the past 2 years 
  
 
-def getUpdatedCreditScore(request):
-	#country, curIncMo, curHouseExp,workExp, bankAcc, bankBal, cashBal,arrLenMo,outDebt, outDebtAmt, outDebtTerm, paidDebt, misPay, misPayFreq
-	account = request.user.account
-	financials = FinancialInfo.objects.get(account=account)
-	country = account.country
-	curIncMo = financials.monthly_income
-	curHouseExp = financials.housing_expense
-	workExp = Employment.objects.filter(account=request.user.account).exists()
-	bankAcc = financials.has_bank_account
-	bankBal = financials.amount_in_bank
-	cashBal = financials.amount_cash
-	arrLenMo = financials.time_in_europe
-	outDebt = financials.ongoing_debt
-	outDebtAmt = financials.amount_debts
-	outDebtTerm = financials.num_months_debt
-	# the user has previously had debt and it is not ongoing, meaning it has been repaid
-	paidDebt = financials.has_debts and (not financials.ongoing_debt) 
-	misPay = (financials.missed_payments != 0)
-	misPayFreq = financials.missed_payments
-
-	credit_score = creditScore(curIncMo, curHouseExp, workExp, bankAcc, bankBal, cashBal,arrLenMo,outDebt, outDebtAmt, outDebtTerm, paidDebt, misPay, misPayFreq)
-
-	return credit_score
 
