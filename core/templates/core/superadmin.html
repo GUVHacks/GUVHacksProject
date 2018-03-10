@@ -1,164 +1,126 @@
-{% extends 'core/base/base.html' %}
+{% load staticfiles %}
 
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    	<style>
+    		ul,li { list-style-type:none; text-align:left; }
+    		p {text-align:left !important;}
+    	</style>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="GUVHacks">
+        <link rel="icon" href="{% static 'core/site.ico' %}">
+        <title>Credit Ability</title>
 
-<script>
-	/*
-	 * Produces pretty score indicator--also works without js
-	 */
-	var colorsByScore = {
-		bad:"#f94b5c",
-		weak:"#fff24d",
-		okay:"#f7bb63",
-		good: "#2ecc71",
-		excellent: "#2ecc71"
-	};
-	var score = {{credit_score}};
+        <!-- Custom styles for this template -->
+        <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'custom.css' %}" />
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    </head>
 
-	$(document).ready(function(){
+    <body>
+        {% block navbar %}
+            {% include 'core/base/nav.html' %}
+        {% endblock %}
+        <br/>
+        <h1 style="text-align:center;">Administrative Portal</h1>
+        <hr/>
 
-		//unhide foreground, now that we know JS is working
-		//$("#foreground").show();
+		<div class="container container-fluid">
+			<div class="row">
+				<div class="col-lg-4 col-md-4">
+					<div id="applications-list" class="list-group">
+						{% for app in applications %}
+					  		<a class="list-group-item list-group-item-action" href="#list-item-{{forloop.counter}}">{{app.account.name}}</a>
+					  	{%empty%} <h2> No Data!</h2>
+					  	{% endfor %}
+					</div>
+				</div>
+				<div class="col-lg-8 col-md-8">
+					<div data-spy="scroll" data-target="#list-example" data-offset="0" class="scrollspy-example">
+						{% for app in applications %}
+						  <h1 id="list-item-{{forloop.counter}}">{{app.name}}</h1>
 
-		//fill score text
-		$("#score-text").html(score);
+							<img src="{{ app.account.profile_photo.url}}" style="margin:10px auto 10px auto;display:block;width:240px;border-radius:120px;" />
+							<h1 style="text-align:center">{{ app.account.name }}</h1>					
 
-		var coords = [[50.0,250.0]]; // initial point
-		if (score >=50){
-			var sc = (score-50)/50 * 250;
-			xCoord = .6*sc + 200.0;
-			yCoord = .8*sc + 50.0;
+							<hr>
+						<div class="row">
+							<div class="col-md-5 col-lg-5">
+								<h3>Creditability Score: <b><i>{{ app.account.credit_score }}</b></i></h3>
 
-			//middle point
-			coords.push([200.0,50.0]);
-			//terminal point
-			coords.push([xCoord,yCoord]);
-		} else if (score == 50) {
-			//middle pt
-			coords.push([200.0,50.0]);
-		} else if (score > 0) {
-			var sc = (score)/50 * 250;
-			xCoord = .6*sc+50;
-			yCoord = 250-.8*sc;
-			//second point (no middle pt since on left side of path)
-			coords.push([xCoord,yCoord]);
-		} else { //BAD, score is <= 0
-			$("#foreground").attr("stroke","none");
-			$("#background").attr("stroke",colorsByScore["bad"]);
+								<p>Name: {{ app.account.name }}</p>
+								<p>City: {{ app.account.city }}</p>
+								<p>Country: {{ app.account.country }}</p>
+								<p>Phone: {{ app.account.phone }}</p>
+								<p>Age: {{ app.account.age }}</p>
+								<p>Email: {{ app.account.user.email }}</p>
 
-			//fill score text
-			$("#score-text").html("!");
-			$("#score-text").attr("style","fill:"+colorsByScore["bad"]);
+								<h3>Lease Request Details:</h3>
+								<p>Monthly Cost: {{ app.lease.amount}}</p>
+								<p>Leaser Name: {{ app.lease.leaser_name}}</p>
+								<p>Leaser Email: {{ app.lease.leaser_email}}</p>
+								<p>Duartion: {{ app.lease.duration}} months</p>
+							</div><!--5 col #1-->
+							<div class="col-lg-5 col-md-5">
+								<h3>Employment History</h3>
+								{% for job in app.jobs %}
+									<ul>
+										<li>Employer Name: {{ job.employer }}</li>
+										<li>Start Date: {{ job.start_date }}</li>
+										<li>End Date: {{ job.end_date }}</li>
+										<li>Monthly Salary: {{ job.monthly_salary }}</li>
+									</ul>
+								{% empty %}
+									<p>No Data!</p>
+								{% endfor %}
+							</div><!--5 col #2-->
+							<row>
+								<div class="col-lg-12 col-md-12" style="text-align: center;">
+									<br/>
+									<h3>Computed Risk Assessment: Probability of Delinquency by Month</h3>
+									<br/>
+									<h4>This assessment takes into account:</h4>
+										<ul style="text-align:left !important;margin-bottom:30px;">
+											<li>That cash outflows for rent per month should ideally remain about 30% of the applicant's income.</li>
+											<li>By default, the employment rate is 0.7 i.e. the probability for the applicant to get a job within a month is 0.7</li>
+											<li><b>Methodology:</b> Use simulations with randomization to simulate real life possiblities.
+												<li>When the applicant ends the contract, the model uses bernoulli trial with p = employment. If the outcome is 1, the applicant gets a new job and to simulate the real lifethe length/contract for the new job is either 1 or 2 or 3 or 4 months with the equal probability</li>
+											</li>
+										</ul>
+									<table style="width:100%;border:1px solid #777">
+										<tr style="border:1px solid #777">
+											<th style="width:30%;">Month</th>
+											<th style="width:30%;">Probability of Delinquency</th>
+										</tr>
+									{% for prob in app.risk_profile %}
+										<tr style="border:1px solid #777">
+											<td>{{forloop.counter}}</td>
+											<td>{{prob}}%</td>
+										</tr>
+									{% empty %}
+										<p>No Data!</p>
+									{% endfor %}
+								</table>
+							{% endfor %}
+							</row>
+					</div><!--data-spy scroller div-->
+				</div><!--col-->
+			</div><!--/row-->
+		</div> <!--container-->
+		{% block messages %}
+        {% include 'core/base/messages.html' %}
+	    {% endblock %}
+	    {% block content %}
+	    {% endblock %}
 
-		}
-		oString = "";
-		for (var i = 0; i < coords.length; i++){
-			console.log(coords[i][0]+","+coords[i][1]+" ");
-			oString += (coords[i][0]+","+coords[i][1]+" ");			
-		}
-		$("#foreground").attr("points",oString);
-		//color of score text
-		if (score < 40 && score > 0){ 
-			$("#score-text").attr("style","fill:"+colorsByScore["weak"]);
-			$("#foreground").attr("stroke",colorsByScore["weak"]);
-			$("#comment-text").html("Weak");
-		} else if (score >= 40 && score < 60) {
-			$("#score-text").attr("style","fill:"+colorsByScore["okay"]);
-			$("#foreground").attr("stroke",colorsByScore["okay"]);
-			$("#comment-text").html("Okay");
-		} else if (score >= 60 && score < 80) {
-			$("#score-text").attr("style","fill:"+colorsByScore["good"]);
-			$("#foreground").attr("stroke",colorsByScore["good"]);
-			$("#comment-text").html("Good");
-		} else if (score >= 80) {
-			$("#score-text").attr("style","fill:"+colorsByScore["excellent"]);
-			$("#foreground").attr("stroke",colorsByScore["excellent"]);
-			$("#comment-text").html("Excellent");
-		}			
-	});
-</script>
-
-<div class="container container-fluid">
-	{% if user.account.has_lease %}
-	<script>
-		var lease_duration_elapsed = {{user.account.lease.payments_made}};
-		var total_lease_duration = {{user.account.lease.duration}};
-		var lease_percentage_decimal = parseFloat(lease_duration_elapsed) / parseFloat(total_lease_duration);
-		var progressOutOf280 = lease_percentage_decimal * 280.0;
-		$(document).ready(function(){
-			$("#lease-indic-fg").attr("points","10,20 "+(progressOutOf280+10)+",20");
-		});
-	</script>
-	<!--lease progress view-->
-	<div class="alert alert-secondary" role="alert">
-		<svg version="1.0" id="score-viewer" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-			 viewBox="0 0 300 55" enable-background="new 0 0 300 55" xml:space="preserve">
-		<!--background shape-->
-		<polyline id="lease-indic-bg" fill="none" stroke="#cccccc" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
-			10,20 290,20 "/>
-		<!--foreground shape-->
-		<polyline id="lease-indic-fg" fill="none" stroke="#662d91" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
-			10,20 10,20 "/>
-		<!--lease indic text-->
-		<text id="lease-progress-text" text-anchor="middle" x="150" y="50" font-size=".9em" font-family="Helvetica">Your Lease Payment Progress: {{user.account.lease.payments_made}} payments</text>
-		</svg>
-	</div><!--alert for lease progress alert-->
-	{% endif %}
-	<div class="row">
-		<p style="color:#777777;">Your Credit Ability Score:</p>
-	</div>
-	<div class="row">
-	<!--credit indicator shape-->
-		<svg version="1.0" id="score-viewer" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-			 viewBox="0 0 400 400" enable-background="new 0 0 400 400" xml:space="preserve">
-
-		<!--background shape-->
-		<polyline id="background" fill="none" stroke="#cccccc" stroke-width="60" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
-			50,250 200,50 350,250 "/>
-		<!--foreground shape-->
-		<polyline id="foreground" fill="none" stroke="none" stroke-width="60" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
-			50,250 200,50 275,150 "/>
-		<!--score text-->
-		<text id="score-text" text-anchor="middle" x="200" y="250" font-size="72" font-family="Helvetica"></text>
-		<!--dividing line-->
-		<polyline id="divider-line" stroke="#cccccc" stroke-width="1" points="50,295 350,295" />
-		<!--comment text-->
-		<text id="comment-text" text-anchor="middle" x="200" y="344" font-size="48" style="fill:#777777"font-family="Helvetica"></text>
-		</svg>
-	<!--buttons box for nav-->
-	    <div class="buttons-box">
-	        <div class="buttons-box-button">
-	            <a href="/profile"><div class="button-image" style="background-image:url('{{user.account.profile_photo.url}}');background-size:cover;"></div></a>
-	            <div class="button-label-content">Profile</div>
-	        </div>
-	        <a href="/financials"><div class="buttons-box-button">
-	            <a href="/financials/"><div class="button-image financials-icon"></div></a>
-	            <div class="button-label-content">Financials</div>
-	        </div>
-	        <div class="buttons-box-button ">
-	            <a href="#"><div class="button-image notifications-icon"></div></a>
-	            <div class="button-label-content">Notifications</div>
-	        </div>
-			<div class="buttons-box-button ">
-	            <a href="/faq"><div class="button-image help-icon"></div></a>
-	            <div class="button-label-content">Help</div>
-	        </div>
-	    </div> <!--buttons-box-->
-    </div><!--/row-->
-    <div class="row">
-	    <!--action button-->
-		{% if user.account.has_lease %}
-			<a href="/join-group">
-				<button type="button" class="btn btn-primary">Join Lease Insurance Group</button>
-			</a>
-		{% elif not user.account.has_lease and user.account.applied_for_lease %}
-				<button type="button" class="btn btn-secondary">Your Lease Support Application is Processing...</button>
-		{% else %}
-			<a href="/lease-apply">
-				<button type="button" class="btn btn-primary">Apply for Lease Support</button>
-			</a>    	
-		{% endif %}
-	</div><!--/row-->
-</div> <!--container-->
-
-{% endblock %}
+        <!-- JavaScript -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+    </body>
+</html>

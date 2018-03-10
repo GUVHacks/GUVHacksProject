@@ -70,6 +70,9 @@ def individualDefaultRatio(applicant,rent,rentTerm,employment=.7):
         result[rentTerm] = app.bankBal+result[rentTerm]
     result =  [i/10000 for i in result]
     
+    #cast everything as float to avoid problems later on
+    for i in range(len(result)):
+        result[i] = float(result[i])
     return result
 
 # ########### example call. DO NOT INCLUDE IN THE CODE ###########

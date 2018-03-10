@@ -17,6 +17,8 @@ from .defaultModel import applicant,individualDefaultRatio
 from core.forms import *
 from core.models import *
 
+import json
+
 @login_required(login_url='/login/')
 def index(request):
 
@@ -146,7 +148,7 @@ def history(request):
 			else:
 				print(form.errors)
 
-	return render(request, 'core/history.html', context)
+	return render(request, 'core/index.html', context)
 
 
 @login_required(login_url='login')
@@ -268,10 +270,12 @@ def lease_apply(request):
 			if form.is_valid():
 				lease = form.save(commit=False)
 				lease.account = request.user.account
-				lease.save()
+				#lease.save() not yet!
 				messages.add_message(request, messages.SUCCESS, 'Application submitted!')
 				request.user.account.applied_for_lease = True
 				request.user.account.save()
+
+				#perform a risk profile calculation using Yanchen's tool
 				print("Leaser risk profile calculation:")
 				acct = request.user.account
 
@@ -291,6 +295,11 @@ def lease_apply(request):
 				a = applicant(employed,income,bankBal,remainTerm,income)
 				res = individualDefaultRatio(a,lease.amount,lease.duration)
 				print(res)
+
+				#save the risk profile data to this lease and save the lease
+				lease.risk_profile_string = json.dumps(res)
+				lease.save()
+
 				return redirect('index')
 
 
@@ -352,4 +361,29 @@ def leaser_view(request, share_key):
 
 @user_passes_test(lambda u: u.is_superuser)
 def superadmin(request):
+	apps = []
+	for l in Lease.objects.all(): 
+		if not l.approved:
+			print("Not approved!")
+			print("Leaser Name:",l.leaser_name)
+			print("Amount: ",l.amount)
+			acct = l.account
+			print("Acct is ",acct.credit_score)
+
+			riskProfile = None
+			if l.risk_profile_string is not None:
+				riskProfile = json.loads(l.risk_profile_string)
+				print("Risk profile is ",riskProfile)
+				del riskProfile[len(riskProfile)-1]
+			#convert risk profiles into percentages
+			for i in range(len(riskProfile)):
+				riskProfile[i] = 100.0*riskProfile[i]
+			apps.append({'lease':l,
+						'account':acct,
+						'jobs':Employment.objects.filter(account=acct),
+					  'risk_profile': riskProfile,
+						})
+	#done looping, construct final context
+	context = {'applications': apps}
+
 	return render(request, 'core/superadmin.html',context)

@@ -148,5 +148,9 @@ class Lease(models.Model):
 
 	group = models.ForeignKey(Group, blank=True, null=True)
 
+	approved = models.BooleanField(default=False)
+
+	risk_profile_string = models.CharField(max_length=1024,null=True,blank=True)
+
 signals.post_save.connect(Employment.post_save, sender=Employment)
 signals.post_save.connect(FinancialInfo.post_save, sender=FinancialInfo)
