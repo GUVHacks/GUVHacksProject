@@ -7,14 +7,17 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.views.generic import UpdateView
 from .creditScore import creditScore
 from django.core.mail import send_mail
 
+from .defaultModel import applicant,individualDefaultRatio
 from core.forms import *
 from core.models import *
+
+import json
 
 @login_required(login_url='/login/')
 def index(request):
@@ -124,13 +127,13 @@ def history(request):
 				messages.add_message(request, messages.ERROR, 'Invalid form')
 		elif action == 'add_id':
 			form = IdentificationForm(request.POST, request.FILES)
-			if form.is_valid():
+			if form.is_valid() and not Identification.objects.filter(account=request.user.account).exists():
 				identification = form.save(commit=False)
 				identification.account = request.user.account
 				identification.save()
 				messages.add_message(request, messages.SUCCESS, 'ID Added')
 			else:
-				print(form.errors)
+				print(request.user.account.id)
 		elif action == 'fin_info':
 			form = FinancialInfoForm(request.POST)
 			if form.is_valid():
@@ -138,10 +141,10 @@ def history(request):
 				fin_info.account = request.user.account
 				fin_info.save()
 				messages.add_message(request, messages.SUCCESS, 'Information saved.')
-				credit_score = getUpdatedCreditScore(request)
+				credit_score = getUpdatedCreditScore(request.user)
 				print(credit_score)
-				account.credit_score = credit_score
-				account.save()
+				request.user.account.credit_score = credit_score
+				request.user.account.save()
 			else:
 				print(form.errors)
 
@@ -198,33 +201,39 @@ class EditPersonalInfoView(UpdateView):
 @login_required(login_url='login')
 def financials(request):
 
-	employment_form = EmploymentForm()
-	financials = FinancialInfo.objects.get(account=request.user.account)
-	account = request.user.account
-	context = {'account': account,
-			   'financials': financials,
-			   'employment_form': employment_form}
+	#check if a financial profile exists for this user--page load will fail without one
+	if not FinancialInfo.objects.filter(account=request.user.account).exists():
+		return redirect('/history/')
+	else:
+		#otherwise...
+		employment_form = EmploymentForm()
+		financials = FinancialInfo.objects.get(account=request.user.account)
+		account = request.user.account
+		context = {'account': account,
+				   'financials': financials,
+				   'employment_form': employment_form}
 
 
-	if request.method == 'POST':
-		action = request.POST.get('action')
-		print(action)
-		if action == 'add_employment':
-			form = EmploymentForm(request.POST)
-			if form.is_valid():
-				employment = form.save(commit=False)
-				employment.account = request.user.account
-				employment.save()
-				messages.add_message(request, messages.SUCCESS, 'Employment Added')
-			else:
-				print(form.errors)
-				messages.add_message(request, messages.ERROR, 'Invalid form')
-		elif action == 'delete_employment':
-			pk = request.POST.get('pk')
-			employment = Employment.objects.get(pk=pk)
-			employment.delete()
+		if request.method == 'POST':
+			action = request.POST.get('action')
+			print(action)
+			if action == 'add_employment':
+				form = EmploymentForm(request.POST)
+				if form.is_valid():
+					employment = form.save(commit=False)
+					employment.account = request.user.account
+					employment.save()
+					messages.add_message(request, messages.SUCCESS, 'Employment Added')
+				else:
+					print(form.errors)
+					messages.add_message(request, messages.ERROR, 'Invalid form')
+			elif action == 'delete_employment':
+				pk = request.POST.get('pk')
+				employment = Employment.objects.get(pk=pk)
+				employment.delete()
 
-	return render(request, 'core/financials.html', context)
+
+		return render(request, 'core/financials.html', context)
 
 
 class EditFinancialInfoView(UpdateView):
@@ -261,10 +270,36 @@ def lease_apply(request):
 			if form.is_valid():
 				lease = form.save(commit=False)
 				lease.account = request.user.account
-				lease.save()
+				#lease.save() not yet!
 				messages.add_message(request, messages.SUCCESS, 'Application submitted!')
 				request.user.account.applied_for_lease = True
 				request.user.account.save()
+
+				#perform a risk profile calculation using Yanchen's tool
+				print("Leaser risk profile calculation:")
+				acct = request.user.account
+
+				empInfo = Employment.objects.filter(account = acct)
+				employed=False
+				for emp in empInfo:
+					if emp.currently_employed:
+						employed = True
+				finInfo = FinancialInfo.objects.get(account = acct)
+				bankBal = finInfo.amount_in_bank
+				income = finInfo.monthly_income
+				#secondary check
+				if not employed:
+					income = 0
+				remainTerm = lease.months_left_in_current_job
+
+				a = applicant(employed,income,bankBal,remainTerm,income)
+				res = individualDefaultRatio(a,lease.amount,lease.duration)
+				print(res)
+
+				#save the risk profile data to this lease and save the lease
+				lease.risk_profile_string = json.dumps(res)
+				lease.save()
+
 				return redirect('index')
 
 
@@ -324,4 +359,31 @@ def leaser_view(request, share_key):
 	return render(request, 'core/leaser_view.html', context)
  
 
+@user_passes_test(lambda u: u.is_superuser)
+def superadmin(request):
+	apps = []
+	for l in Lease.objects.all(): 
+		if not l.approved:
+			print("Not approved!")
+			print("Leaser Name:",l.leaser_name)
+			print("Amount: ",l.amount)
+			acct = l.account
+			print("Acct is ",acct.credit_score)
 
+			riskProfile = None
+			if l.risk_profile_string is not None:
+				riskProfile = json.loads(l.risk_profile_string)
+				print("Risk profile is ",riskProfile)
+				del riskProfile[len(riskProfile)-1]
+			#convert risk profiles into percentages
+			for i in range(len(riskProfile)):
+				riskProfile[i] = 100.0*riskProfile[i]
+			apps.append({'lease':l,
+						'account':acct,
+						'jobs':Employment.objects.filter(account=acct),
+					  'risk_profile': riskProfile,
+						})
+	#done looping, construct final context
+	context = {'applications': apps}
+
+	return render(request, 'core/superadmin.html',context)

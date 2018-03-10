@@ -16,6 +16,7 @@
 	var score = {{credit_score}};
 
 	$(document).ready(function(){
+
 		//unhide foreground, now that we know JS is working
 		//$("#foreground").show();
 
@@ -48,7 +49,7 @@
 			//fill score text
 			$("#score-text").html("!");
 			$("#score-text").attr("style","fill:"+colorsByScore["bad"]);
-
+			$("#comment-text").html("Bad");
 		}
 		oString = "";
 		for (var i = 0; i < coords.length; i++){
@@ -135,7 +136,7 @@
 	            <div class="button-label-content">Financials</div>
 	        </div>
 	        <div class="buttons-box-button ">
-	            <a href="#"><div class="button-image notifications-icon"></div></a>
+	            <a href="#"><div class="button-image notifications-icon" data-toggle="modal" data-target="#notificationsModal"></div></a>
 	            <div class="button-label-content">Notifications</div>
 	        </div>
 			<div class="buttons-box-button ">
@@ -160,4 +161,29 @@
 	</div><!--/row-->
 </div> <!--container-->
 
+<!--notifications modal-->
+<div class="modal" id="notificationsModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Notifications!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      	<ul>
+      		{% for notif in notifications %}
+      		<li>{{ notif.content }}</li>
+      		{% empty %}
+      		<p>No notifications</p>
+      		{% endfor %}
+      	</ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

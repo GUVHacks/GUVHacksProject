@@ -48,8 +48,10 @@ def creditScore(curIncMo, curHouseExp,workExp, bankAcc, bankBal, cashBal,arrLenM
         moLIAB = 0
     pt = 0
     
-    if (misPay) & (misPayFreq/arrLen >=1): 
-        pt = pt - math.log(misPayFreq)*10/min(arrLen,2)
+    if (misPay) & (misPayFreq/arrLen >1): 
+        pt = pt - math.log(misPayFreq/arrLen)*10
+        if misPay/arrLen <4:
+            pt = pt+ math.log(-misPayFreq/arrLen+5)*15
     elif arrLen > .5:
         pt = pt+10*math.log(arrLen+.5)+30
         
@@ -61,7 +63,7 @@ def creditScore(curIncMo, curHouseExp,workExp, bankAcc, bankBal, cashBal,arrLenM
             penalty = 30
         pt = pt - penalty
     else:
-        pt = pt+math.sqrt((.4-((float(curHouseExp)+moLIAB)/float(curIncMo))))*20
+        pt = pt+min(math.sqrt((.4-((float(curHouseExp)+moLIAB)/float(curIncMo))))*20,30)
         
     if arrLen > .5:
         pt = pt+math.log(arrLen+.5)*10
@@ -73,7 +75,7 @@ def creditScore(curIncMo, curHouseExp,workExp, bankAcc, bankBal, cashBal,arrLenM
         # max bounus here is 20 points 
         pt = pt + ((moneyAvail)/curHouseExp)/.025
     elif moneyAvail >= curHouseExp*.5 and curHouseExp > 0:
-        pt = pt + math.log(moneyAvail/curHouseExp+1.5)*20 +6
+        pt = pt + min(math.log(moneyAvail/curHouseExp+1.5)*10 +13,30)
     if paidDebt:
         pt = pt +30
     

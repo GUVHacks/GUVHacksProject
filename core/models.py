@@ -79,10 +79,12 @@ class Employment(models.Model):
 	def post_save(sender, **kwargs):
 		instance = kwargs.get('instance')
 		created = kwargs.get('created')
-		score = getUpdatedCreditScore(instance.account.user)
-		instance.account.credit_score = score
-		instance.account.save()
-		print("Updating score:",score,"\nScore on account is:",instance.account.credit_score)
+		if FinancialInfo.objects.filter(account=instance.account).exists():
+			
+			score = getUpdatedCreditScore(instance.account.user)
+			instance.account.credit_score = score
+			instance.account.save()
+			print("Updating score:",score,"\nScore on account is:",instance.account.credit_score)
 
 
 class Identification(models.Model):
@@ -101,7 +103,7 @@ class FinancialInfo(models.Model):
 	
 	has_bank_account = models.BooleanField(default=False)
 	amount_in_bank = models.DecimalField(decimal_places=2, max_digits=12, default=0)
-	amount_cash = models.DecimalField(decimal_places=2, max_digits=12,blank=True, null=True)
+	amount_cash = models.DecimalField(decimal_places=2, max_digits=12,blank=True, null=True,default=0)
 
 	has_debts = models.BooleanField(default=False)
 	amount_debts = models.DecimalField(decimal_places=2, max_digits=12, blank=True, default=0)
@@ -142,7 +144,13 @@ class Lease(models.Model):
 	duration = models.IntegerField(default=12) # in months
 	payments_made = models.IntegerField(default=0, blank=True) # in months
 
+	months_left_in_current_job = models.IntegerField(default=0)
+
 	group = models.ForeignKey(Group, blank=True, null=True)
+
+	approved = models.BooleanField(default=False)
+
+	risk_profile_string = models.CharField(max_length=1024,null=True,blank=True)
 
 signals.post_save.connect(Employment.post_save, sender=Employment)
 signals.post_save.connect(FinancialInfo.post_save, sender=FinancialInfo)

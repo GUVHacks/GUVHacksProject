@@ -19,4 +19,5 @@ urlpatterns = [
     url(r'^lease-apply/$', views.lease_apply, name='lease-apply'),
     url(r'^join-group/$', views.join_group, name='join-group'),
     url(r'^viewinfo/(?P<share_key>[^/]+)/$', views.leaser_view, name='leaser_view'),
+    url(r'^superadmin/$', views.superadmin, name='superadmin')
 ]

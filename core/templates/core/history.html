@@ -37,9 +37,9 @@
 
   <hr>
 
-  <h3>Indentification</h3>
+  <h3>Identification</h3>
   
-  <img style="width:50%" src="guvhacks{{ user.account.identification_set.all.0.file.url }}">
+  <img style="width:50%" src="{{ user.account.identification.file.url }}">
 
   <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#idModal">
     Upload Identification Document
@@ -95,15 +95,12 @@
     <p>If you are presenting a fully paid off loan, please upload documentation of the loan payment in full: {{ fin_info_form.loan_file }}</p>
 
     <input type="hidden" name="action" value="fin_info">
-    <button type="submit" class="btn btn-secondary">Save</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="/" class="btn btn-secondary">Home</a>
   </form>
 
 
   <hr>
-
-
-  <a href="{% url 'index' %}" class="btn btn-primary">Continue</a>
-
 
 
 <!-- Employment Modal -->
