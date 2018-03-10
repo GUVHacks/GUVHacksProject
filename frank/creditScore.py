@@ -41,7 +41,7 @@ def creditScore(curIncMo, curHouseExp,workExp, bankAcc, bankBal, cashBal,arrLenM
         
     # Assumption: the fixed expense shouldn't exceed 40% of income 
     if (curHouseExp+moLIAB)/curIncMo > .4:
-        penalty =(((curHouseExp+moLIAB)/curIncMo)-.3) *100
+        penalty =(((curHouseExp+moLIAB)/curIncMo)-.4) *100
         # maximum penalty
         if penalty > 30:
             penalty = 30
