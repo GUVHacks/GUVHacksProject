@@ -85,8 +85,8 @@ class Lease(models.Model):
 	leaser_name = models.CharField(max_length=256)
 	leaser_email = models.CharField(max_length=256)
 
-	guaranter_name = models.CharField(max_length=256)
-	guranter_email = models.CharField(max_length=256)
+	guarantor_name = models.CharField(max_length=256)
+	gurantor_email = models.CharField(max_length=256)
 
 	group = models.ForeignKey(Group)
 

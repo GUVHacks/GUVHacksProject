@@ -149,8 +149,10 @@ def history(request):
 def profile(request):
 
 	profile = request.user.account
+	url = "guvhacks/media/"
 
-	context = {'profile': profile}
+	context = {'profile': profile,
+			   'url': url}
 	return render(request, 'core/profile.html', context)
 
 
