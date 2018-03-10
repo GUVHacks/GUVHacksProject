@@ -47,11 +47,11 @@ def getDeepCopy(app):
 # the real lifethe length/contract for the new job is either 1 or 2 or 3 or 4 
 # months with the equal probability 
 
-def individualDefaultRatio(applicant,rent,employment=.7):
-    result = [0]*13
+def individualDefaultRatio(applicant,rent,rentTerm,employment=.7):
+    result = [0]*(rentTerm+1)
     for j in range(10000):
         app = getDeepCopy(applicant)
-        for i in range(12):
+        for i in range(rentTerm):
             fixedExp = rent*2
             if app.remainTerm ==0:
                 newJob = 1 if random.uniform(0,1)<employment else 0
@@ -67,16 +67,28 @@ def individualDefaultRatio(applicant,rent,employment=.7):
                 app.remainTerm  = app.remainTerm - 1
             if app.bankBal < 0:
                 result[i] = result[i]+1
-        result[12] = app.bankBal+result[12]
+        result[rentTerm] = app.bankBal+result[rentTerm]
     result =  [i/10000 for i in result]
     
     return result
 
 ########### example call. DO NOT INCLUDE IN THE CODE ###########
-a1 = applicant(True,1000,200,2,900)
-individualDefaultRatio(a1,300)
+individualDefaultRatio(applicant(True,1000,200,2,900),300,6)
 ########### END OF EXAMPLE CALL ########################
 
 # For landlord, the only last result[11] is needed for landlord
 
 # For refugees and guaranteurs, they have the access for all information
+
+deplist = [x*20 for x in range(0, 31)]
+defaultProbList = [0]*len(deplist)
+index = 0
+for i in deplist:
+    a1 = applicant(True,1000,i,1,900)
+    defaultProbList[index] = individualDefaultRatio(a1,300)[11]
+    index = index+1
+    
+diffList = []
+for i in range(len(defaultProbList)-1):
+    diffList.append(defaultProbList[i]-defaultProbList[i+1])
+diffList.index(max(diffList))
