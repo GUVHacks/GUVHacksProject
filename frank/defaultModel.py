@@ -5,7 +5,7 @@ class applicant:
     # curIncMo: int or float. if currently employeed, the monthly salary 
     # bankBal: int or float: money in the bank account
     # reminTerm: int: if there person is contracted, how many months remaining for the contract
-    # avgInc: int or float: the income from the most recent job (previous job)
+    # avgInc: int or float: the income from the most recent job
     def __init__(self,curEmploy,curIncMo,bankBal,remainTerm,avgInc):
         self.curIncMo= curIncMo
         self.curEmploy = curEmploy
