@@ -41,6 +41,9 @@ REASONS = (('health', 'Health'),
 			 ('other', 'Other')
 			)
 
+GENDERS = (('Male', 'Male'),
+			('Female', 'Female'))
+
 class Account(models.Model):
 	# Link to the Django user account
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -49,7 +52,7 @@ class Account(models.Model):
 	phone = models.CharField(max_length=100) # function to verify real phone number in form?
 	address = models.CharField(max_length=256) # change to multiple lines, etc?
 	city = models.CharField(max_length=256)
-	gender = models.BooleanField(default=False) # male is false, female is true
+	gender = models.CharField(max_length=10, choices=GENDERS)
 	age = models.IntegerField()
 	country = models.CharField(max_length=256, choices=COUNTRIES)
 	profile_photo = models.FileField(null=True, upload_to="profile_photos/")
@@ -57,6 +60,8 @@ class Account(models.Model):
 
 	applied_for_lease = models.BooleanField(default=False)
 	has_lease = models.BooleanField(default=False)
+
+	share_key = models.CharField(max_length=16, blank=True, null=True)
 
 
 class Employment(models.Model):
