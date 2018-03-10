@@ -78,6 +78,34 @@
 </script>
 
 <div class="container container-fluid">
+	{% if user.account.has_lease %}
+	<script>
+		var lease_duration_elapsed = {{user.account.lease.payments_made}};
+		var total_lease_duration = {{user.account.lease.duration}};
+		var lease_percentage_decimal = parseFloat(lease_duration_elapsed) / parseFloat(total_lease_duration);
+		var progressOutOf280 = lease_percentage_decimal * 280.0;
+		$(document).ready(function(){
+			$("#lease-indic-fg").attr("points","10,20 "+(progressOutOf280+10)+",20");
+		});
+	</script>
+	<!--lease progress view-->
+	<div class="alert alert-secondary" role="alert">
+		<svg version="1.0" id="score-viewer" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+			 viewBox="0 0 300 55" enable-background="new 0 0 300 55" xml:space="preserve">
+		<!--background shape-->
+		<polyline id="lease-indic-bg" fill="none" stroke="#cccccc" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+			10,20 290,20 "/>
+		<!--foreground shape-->
+		<polyline id="lease-indic-fg" fill="none" stroke="#662d91" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+			10,20 10,20 "/>
+		<!--lease indic text-->
+		<text id="lease-progress-text" text-anchor="middle" x="150" y="50" font-size=".9em" font-family="Helvetica">Your Lease Payment Progress: {{user.account.lease.payments_made}} payments</text>
+		</svg>
+	</div><!--alert for lease progress alert-->
+	{% endif %}
+	<div class="row">
+		<p style="color:#777777;">Your Credit Ability Score:</p>
+	</div>
 	<div class="row">
 	<!--credit indicator shape-->
 		<svg version="1.0" id="score-viewer" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -99,7 +127,7 @@
 	<!--buttons box for nav-->
 	    <div class="buttons-box">
 	        <div class="buttons-box-button">
-	            <a href="/profile"><div class="button-image" style="background-image:url('')"></div></a>
+	            <a href="/profile"><div class="button-image" style="background-image:url('{{user.account.profile_photo.url}}');background-size:cover;"></div></a>
 	            <div class="button-label-content">Profile</div>
 	        </div>
 	        <a href="/financials"><div class="buttons-box-button">
@@ -122,6 +150,8 @@
 			<a href="/join-group">
 				<button type="button" class="btn btn-primary">Join Lease Insurance Group</button>
 			</a>
+		{% elif not user.account.has_lease and user.account.applied_for_lease %}
+				<button type="button" class="btn btn-secondary">Your Lease Support Application is Processing...</button>
 		{% else %}
 			<a href="/lease-apply">
 				<button type="button" class="btn btn-primary">Apply for Lease Support</button>

@@ -69,10 +69,10 @@ def creditScore(curIncMo, curHouseExp,workExp, bankAcc, bankBal, cashBal,arrLenM
     if bankAcc:
         pt = pt+10
         
-    if moneyAvail < curHouseExp*.5:
+    if moneyAvail < curHouseExp*.5 and curHouseExp > 0:
         # max bounus here is 20 points 
         pt = pt + ((moneyAvail)/curHouseExp)/.025
-    elif moneyAvail >= curHouseExp*.5:
+    elif moneyAvail >= curHouseExp*.5 and curHouseExp > 0:
         pt = pt + math.log(moneyAvail/curHouseExp+1.5)*20 +6
     if paidDebt:
         pt = pt +30
