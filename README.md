@@ -17,7 +17,7 @@
 ### The credibility score details:
 - To calculate credibility scores, we verify recent employment, income, and payment history information and using algorithms similar to those used by commercial banks but with a focus on short-term income and solvency, we compute a credibility score on a scale from -100 to +100 for users, where 0 represents no verified financial history in a host country.
 - For verification, we work with a third-party verification service like those used by Airbnb to verify ID. If documentation, like paystubs or work agreements, are available, we ask that users upload them; if not, we require an official contact point (e.g., phone number for a real restaurant listed on Yelp) at a bonafide business that we can call as a reference to verify users’ recent financial history.
-Since family and friend networks are important in establishing strong resettled communities, users can send individuals who know them and who can attest to their financial history a one-time link to create a recommendation. These recommendations can attest to the user’s financial history and responsibility.
+- Since family and friend networks are important in establishing strong resettled communities, users can send individuals who know them and who can verify their financial history a one-time link to create a recommendation. These recommendations can attest to the user’s responsibility and finances.
 
 # Inspiration
 
